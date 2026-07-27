@@ -137,7 +137,10 @@ export async function loadOpenApiSpec(): Promise<DynamicTool[]> {
     return cachedTools
   }
 
-  const specUrl = `${env.DMTICKET_API_URL}/public-spec.json`
+  // The published spec lives under /api on the marketing site, not at the API host
+  // root. Overridable so self-hosted installs can point somewhere else entirely.
+  const specUrl =
+    env.DMTICKET_OPENAPI_URL || `${env.DMTICKET_API_URL}/api/openapi.json`
 
   const response = await fetch(specUrl, {
     headers: { Accept: "application/json" },

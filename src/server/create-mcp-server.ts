@@ -78,7 +78,9 @@ async function executeTool(
       method: tool.method,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+        // DMTicket takes a bare token in its own header — an Authorization bearer
+        // is silently unauthenticated and every call comes back 401.
+        api_access_token: apiKey,
       },
       body: sendBody ? JSON.stringify(body) : undefined,
     })

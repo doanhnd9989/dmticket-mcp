@@ -2,22 +2,26 @@
 
 [Model Context Protocol](https://modelcontextprotocol.io) server for **[DMTicket](https://dmticket.com)** — the omnichannel customer-messaging & CRM platform (Zalo, Facebook, Telegram, groups & communities).
 
-It gives AI agents (Claude, Cursor, ChatGPT, custom agents…) live access to a DMTicket workspace: contacts, conversations, messages, tags, custom fields, broadcasts, sequences, flows, triggers and webhooks — so an agent can read, segment, message and automate on your behalf.
+It gives AI agents (Claude, Cursor, ChatGPT, custom agents…) live access to a DMTicket account: contacts, conversations, messages, labels, custom attributes, inboxes, teams, agents, canned responses, automation rules and reports — so an agent can read, segment, message and automate on your behalf.
 
 ## How it works
 
-On startup the server fetches `${DMTICKET_API_URL}/api/public-spec.json` (the DMTicket OpenAPI spec) and **auto-generates one MCP tool per API operation**. When DMTicket adds a new endpoint, it becomes an MCP tool on the next restart — no code changes needed.
+On startup the server fetches the DMTicket OpenAPI spec from `https://dmticket.com/api/openapi.json` and **auto-generates one MCP tool per API operation** — 129 tools at the time of writing. When DMTicket adds a new endpoint, it becomes an MCP tool on the next restart, with no code changes here.
+
+Point it somewhere else with `DMTICKET_OPENAPI_URL` if you self-host.
 
 ## 1. Get your DMTicket API token
 
-1. Sign in to your DMTicket workspace at **https://dmticket.com**
-2. Go to **Settings → Integrations → Workspace Token**
-3. Click **Generate** (or **Regenerate**) and **Copy** the token — it looks like `wsId.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+1. Sign in to your DMTicket account at **https://app.dmticket.com**
+2. Click your avatar (bottom-left) → **Profile settings**
+3. Scroll to the bottom and copy the **Access Token**
 
-The token is scoped to that one workspace and grants access to its public API. Keep it secret; regenerate any time to revoke.
+The token carries your own permissions, so an agent using it can do exactly what you can — no more. Keep it secret; regenerate from the same screen to revoke.
 
-> API base URL: `https://dmticket.com/api` · Auth header: `Authorization: Bearer <token>`
-> Quick test: `curl https://dmticket.com/api/v1/contacts -H "Authorization: Bearer <token>"`
+> API base URL: `https://app.dmticket.com` · Auth header: `api_access_token: <token>`
+> Quick test: `curl https://app.dmticket.com/api/v1/profile -H "api_access_token: <token>"`
+
+Most endpoints are scoped to one account, so you also need your numeric account id — it is the number in the app URL, e.g. `app.dmticket.com/app/accounts/**3**/dashboard`.
 
 ## 2. Install
 

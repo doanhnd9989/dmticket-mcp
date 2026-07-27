@@ -5,6 +5,8 @@ export const env = createEnv({
   server: {
     DMTICKET_API_KEY: z.string().default(""),
     DMTICKET_API_URL: z.url().default("https://dmticket.com"),
+    // Where to fetch the OpenAPI spec from. Defaults to `${DMTICKET_API_URL}/api/openapi.json`.
+    DMTICKET_OPENAPI_URL: z.url().optional(),
     DMTICKET_ALLOW_SELF_SIGNED_CERT: z.enum(["true", "false"]).optional(),
     DMTICKET_MCP_TRANSPORT: z.enum(["stdio", "sse", "both"]).default("both"),
     DMTICKET_MCP_HOST: z.string().default("0.0.0.0"),
