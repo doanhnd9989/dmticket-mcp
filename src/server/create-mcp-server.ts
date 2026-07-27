@@ -78,9 +78,11 @@ async function executeTool(
       method: tool.method,
       headers: {
         "Content-Type": "application/json",
-        // DMTicket takes a bare token in its own header — an Authorization bearer
-        // is silently unauthenticated and every call comes back 401.
-        api_access_token: apiKey,
+        // DMTicket takes a bare token in its own header. Spell it with dashes:
+        // Rails maps `api-access-token` and `api_access_token` to the same value,
+        // but proxies drop headers containing underscores, so the underscored
+        // spelling from the DMTicket docs arrives empty and every call 401s.
+        "api-access-token": apiKey,
       },
       body: sendBody ? JSON.stringify(body) : undefined,
     })
