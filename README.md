@@ -2,7 +2,18 @@
 
 [Model Context Protocol](https://modelcontextprotocol.io) server for **[DMTicket](https://dmticket.com)** — the omnichannel customer-messaging & CRM platform (Zalo, Facebook, Telegram, groups & communities).
 
-It gives AI agents (Claude, Cursor, ChatGPT, custom agents…) live access to a DMTicket account: contacts, conversations, messages, labels, custom attributes, inboxes, teams, agents, canned responses, automation rules and reports — so an agent can read, segment, message and automate on your behalf.
+It gives AI agents (Claude, Cursor, ChatGPT, custom agents…) live access to a DMTicket account: contacts, conversations, messages, labels, custom attributes, inboxes, teams, agents, canned responses, automation and reports — so an agent can read, segment, message and automate on your behalf.
+
+## Build the automation, don't just read the data
+
+Most helpdesk integrations stop at "list my conversations". DMTicket exposes the pieces an agent needs to stand up a working business process on its own:
+
+- **Data sources** — register a connection to a Lark sheet, PostgreSQL, or MySQL. The agent references it *by name*; the credentials stay server-side and are never handed to the model. Reads only — SQL that is not a single `SELECT` is rejected.
+- **Scheduled flows** — automation that fires on a cron schedule rather than waiting for a conversation to exist. Read rows, filter them, extract fields, skip what was already handled, then draft or send.
+- **Dry run** — `POST /scheduled_flows/{id}/run` defaults to a dry run: the pipeline executes for real, but actions are reported instead of performed. An agent can show you exactly what a flow will send before it sends anything.
+- **Durable dedupe** — `automation_states` claims a key atomically, so a restart, a redeploy, or an overlapping run never processes the same row twice.
+
+Hand an agent your token and this server, describe the process in plain language, and it can build and test the automation end to end.
 
 ## How it works
 
@@ -18,8 +29,10 @@ Point it somewhere else with `DMTICKET_OPENAPI_URL` if you self-host.
 
 The token carries your own permissions, so an agent using it can do exactly what you can — no more. Keep it secret; regenerate from the same screen to revoke.
 
-> API base URL: `https://app.dmticket.com` · Auth header: `api_access_token: <token>`
-> Quick test: `curl https://app.dmticket.com/api/v1/profile -H "api_access_token: <token>"`
+> API base URL: `https://app.dmticket.com` · Auth header: `api-access-token: <token>`
+> Quick test: `curl https://app.dmticket.com/api/v1/profile -H "api-access-token: <token>"`
+>
+> Spell the header with **dashes**. Rails maps `api-access-token` and `api_access_token` to the same value, but proxies strip headers containing underscores, so the underscored spelling arrives empty and every call 401s.
 
 Most endpoints are scoped to one account, so you also need your numeric account id — it is the number in the app URL, e.g. `app.dmticket.com/app/accounts/**3**/dashboard`.
 
@@ -91,7 +104,7 @@ DMTICKET_API_KEY=<token> DMTICKET_MCP_TRANSPORT=sse DMTICKET_MCP_PORT=3333 node 
 
 ## Tools
 
-Tool names are the OpenAPI `operationId` in `snake_case` — e.g. `list_contacts`, `create_contact`, `add_contact_tag`, `list_conversations`, `send_contact_message`, `list_broadcasts`, `create_broadcast`, `list_flows`, `list_tags`, `create_webhook`, … The full set is generated live from the spec, so it always matches your DMTicket version.
+Tool names are the OpenAPI `operationId` in `snake_case` — e.g. `list_contacts`, `create_contact`, `list_conversations`, `create_message`, `create_data_source`, `query_data_source`, `create_scheduled_flow`, `run_scheduled_flow`, `list_scheduled_flow_runs`, `claim_automation_state`, `create_webhook`, … The full set is generated live from the spec, so it always matches your DMTicket version.
 
 ## Security
 
