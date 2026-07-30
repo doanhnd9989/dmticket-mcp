@@ -1,0 +1,31 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            # TODO: Ensure this is the correct path to your project on the VPS
+            cd /root/dmticket-mcp || { echo "Project directory not found"; exit 1; }
+            
+            # Pull latest changes
+            git pull origin main || git pull origin master
+            
+            # Install dependencies and build
+            npm install
+            npm run build
+            
+            # TODO: Add the command to restart your MCP service (e.g., pm2 restart mcp)
+            # pm2 restart mcp
