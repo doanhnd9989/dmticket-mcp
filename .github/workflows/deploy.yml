@@ -15,7 +15,7 @@ jobs:
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
-          password: ${{ secrets.VPS_PASSWORD }}
+          key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             # TODO: Ensure this is the correct path to your project on the VPS
             cd /root/dmticket-mcp || { echo "Project directory not found"; exit 1; }
